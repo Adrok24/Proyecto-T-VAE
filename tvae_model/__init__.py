@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 from tensorflow.keras.layers import Layer, Dense, LSTM, Bidirectional, TimeDistributed
 import tensorflow.keras.backend as K
 import pandas as pd
+print(tf)
 from .multiheadattention import MultiHeadAttention
 from .positional_encoding import PositionalEncoding
 from .sampling import Sampling
