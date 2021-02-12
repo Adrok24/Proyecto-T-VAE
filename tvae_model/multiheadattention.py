@@ -9,20 +9,36 @@ import tensorflow.keras.backend as K
 import pandas as pd
 
 
+def scaled_dot_product_attention(query, key, value, mask):
+  """Calculamos attention weights """
+
+  ## hacemos el producto de query por la transpuesta de key
+  matmul_qk = tf.matmul(query, key, transpose_b=True)
+
+  ## escalamos por la raiz cuadrado del # dims
+  depth = tf.cast(tf.shape(key)[-1], tf.float32)
+  logits = matmul_qk / tf.math.sqrt(depth)
+
+  ## agregamos la mascara
+  if mask is not None:
+    logits += (mask * -1e9)
+
+  ## aplicamos la softmax
+  attention_weights = tf.nn.softmax(logits, axis=-1)
+
+  ## y multiplicamos por value 
+  output = tf.matmul(attention_weights, value)
+
+  return output
+
 
 class MultiHeadAttention(tf.keras.layers.Layer):
-
   ''' Vamos a armar la capa para multihead attention '''
 
   def __init__(self, d_model, num_heads, name="multi_head_attention"):
     super(MultiHeadAttention, self).__init__(name=name)
 
-    ## que es este super?
-    ## super() te permite acceeder a los metodos de la super clase de la cual
-    ## la subclase está heredando. En este caso, estas herendando de Layers.
-        
-    ## definimos algunos parametros: cuantas cabezas va a tener self attention 
-    ## y la dimensionalidad del embedding
+
     self.num_heads = num_heads
     self.d_model = d_model
 
@@ -38,10 +54,6 @@ class MultiHeadAttention(tf.keras.layers.Layer):
     self.dense = tf.keras.layers.Dense(units=d_model)
 
   def split_heads(self, inputs, batch_size):
-    ## vamos a armar la division en cabezas. 
-    ## se va a entender mejor en el siguiente bloque de codigo
-    ## por ahora es solamente la forma en la que 
-    ## reacomodamos los datos para armar las cabezas
     inputs = tf.reshape(
         inputs, shape=(batch_size, -1, self.num_heads, self.depth))
     return tf.transpose(inputs, perm=[0, 2, 1, 3])
