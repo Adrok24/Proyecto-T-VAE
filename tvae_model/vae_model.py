@@ -1,5 +1,8 @@
 from tensorflow.keras.models import Model
 from contextlib import suppress
+import tensorflow as tf
+from tensorflow.keras.layers import Layer, Dense, Dropout, LayerNormalization, TimeDistributed, LSTM
+
 
 
 def encoder_layer(units, d_model, num_heads, dropout, name="encoder_layer"):
@@ -67,10 +70,7 @@ def encoder(vocab_size, num_layers, units, d_model, num_heads,
 
   # Generamos el logaritmo de la varianza
   logvar = Dense(latent_space, name='logvar')(outputs)
-  # Usamos esos parámetros para samplear el espacio latente
   z = Sampling(name='encoder_output')([mu, logvar])
-
-  #output = Dense(d_model, name='latent space')(outputs)
 
   return tf.keras.Model(
       inputs=inputs, outputs=[mu, logvar, z], name=name)
@@ -180,37 +180,21 @@ class VAEModel(Model):
       loss = tf.keras.losses.SparseCategoricalCrossentropy(
           from_logits=True, reduction='none')(y_true, y_pred)
 
-      ## aplicamos una mascara
-      # mask = tf.cast(tf.not_equal(y_true, 0), tf.float32)
-      # loss = tf.multiply(loss, mask)
-
-      ## y reducimos la loss
       return tf.reduce_mean(loss)
 
-    # Definimos el train step para que utilice la función de costo compuesta por el error de reconstrucción y la divergencia KL
     def train_step(self, data):
-        data = data[0]
 
-        
-        # Iniciamos el cálculo de la loss dentro del contexto que registra las operaciones para poder derivarlas
-        with tf.GradientTape() as tape:
-            # Usamos el encoder para mapear las oraciones al espacio latente y obtenemos los parámetros de la distribución
-            
+        data = data[0]
+        with tf.GradientTape() as tape:            
             
             z_mean, z_log_var, z = self.encoder(data)
-            # Reconstruimos la oración a partir de z
-
             reconstruction = self.decoder(z)
 
             reconstruction_loss = self.loss_function(data, reconstruction)
 
-            # Escalamos la pérdida con el r_loss_factor
-           # reconstruction_loss *= self.r_loss_factor
-            # Calculamos la divergencia KL usando la media y la varianza
             kl_loss = 1 + z_log_var - tf.square(z_mean) - tf.exp(z_log_var)
             kl_loss = tf.reduce_sum(kl_loss, axis = 1)
             kl_loss *= -0.5
-            # Selecciona funcion de annealing
             if self.function == 'linear':
               factor = self.a * beta + self.b
             else:
@@ -218,12 +202,9 @@ class VAEModel(Model):
 
             total_loss = reconstruction_loss + kl_loss * factor
 
-        # Calculamos los gradientes
         grads = tape.gradient(total_loss, self.trainable_weights)
         
-        # Actualizamos los pesos
         self.optimizer.apply_gradients(zip(grads, self.trainable_weights))
-        # El método train_step debe devolver un diccionario
         return {
             "loss": total_loss,
             "reconstruction_loss": reconstruction_loss,
@@ -233,10 +214,7 @@ class VAEModel(Model):
 
     def reconstruct(self, q_sample, silent_reconstruct=False, silent_orig=True):
       _,_,result = model.encoder(q_sample.reshape(1,MAX_LENGTH,1))
-      #decoded from sample
       print('Reconstr: ',self.decode_sample(result, silent_reconstruct))
-
-      # original  
       print('Original: ',tokenizer.decode([i for i in q_sample if i < tokenizer.vocab_size]))
       if (silent_orig == False):
         print(q_sample)

@@ -1,32 +1,20 @@
 import tensorflow as tf
-import tensorflow_datasets as tfds
-import os
-import re
-import numpy as np
-import matplotlib.pyplot as plt
-from tensorflow.keras.layers import Layer, Dense, LSTM, Bidirectional, TimeDistributed
-import tensorflow.keras.backend as K
-import pandas as pd
+from tensorflow.keras.layers import Layer, Dense
 
 
 def scaled_dot_product_attention(query, key, value, mask):
   """Calculamos attention weights """
 
-  ## hacemos el producto de query por la transpuesta de key
   matmul_qk = tf.matmul(query, key, transpose_b=True)
 
-  ## escalamos por la raiz cuadrado del # dims
   depth = tf.cast(tf.shape(key)[-1], tf.float32)
   logits = matmul_qk / tf.math.sqrt(depth)
 
-  ## agregamos la mascara
   if mask is not None:
     logits += (mask * -1e9)
 
-  ## aplicamos la softmax
   attention_weights = tf.nn.softmax(logits, axis=-1)
 
-  ## y multiplicamos por value 
   output = tf.matmul(attention_weights, value)
 
   return output
@@ -44,7 +32,6 @@ class MultiHeadAttention(tf.keras.layers.Layer):
 
     assert d_model % self.num_heads == 0
 
-    ## cuantas dimensiones va a tener cada cabeza:
     self.depth = d_model // self.num_heads
 
     self.query_dense = tf.keras.layers.Dense(units=d_model)
@@ -79,29 +66,21 @@ class MultiHeadAttention(tf.keras.layers.Layer):
         'value'], inputs['mask']
     batch_size = tf.shape(query)[0]
 
-    # linear layers
     query = self.query_dense(query)
     key = self.key_dense(key)
     value = self.value_dense(value)
 
-    # print(self.name, mask)
-
-    # split heads
     query = self.split_heads(query, batch_size)
     key = self.split_heads(key, batch_size)
     value = self.split_heads(value, batch_size)
 
-    # scaled dot-product attention
     scaled_attention = scaled_dot_product_attention(query, key, value, mask)
 
-    # acomodamos las dimensiones
     scaled_attention = tf.transpose(scaled_attention, perm=[0, 2, 1, 3])
 
-    # concatenamos las cabezas
     concat_attention = tf.reshape(scaled_attention,
                                   (batch_size, -1, self.d_model))
 
-    # final linear layer
     outputs = self.dense(concat_attention)
 
     return outputs

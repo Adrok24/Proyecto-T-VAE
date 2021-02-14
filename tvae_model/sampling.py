@@ -1,3 +1,6 @@
+import tensorflow.keras.backend as K
+
+
 class Sampling(Layer):
     def call(self, inputs):
         mu, log_var = inputs

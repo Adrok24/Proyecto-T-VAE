@@ -1,3 +1,6 @@
+import tensorflow as tf
+
+
 class PositionalEncoding(tf.keras.layers.Layer):
   ''' Armamos los encodings de posición '''
 
@@ -5,7 +8,6 @@ class PositionalEncoding(tf.keras.layers.Layer):
     super(PositionalEncoding, self).__init__()
     self.pos_encoding = self.positional_encoding(position, d_model)
 
-  ## comparar con formula de la teorica
   def get_angles(self, position, i, d_model):
     angles = 1 / tf.pow(10000, (2 * (i // 2)) / tf.cast(d_model, tf.float32))
     return position * angles
