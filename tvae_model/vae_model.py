@@ -1,153 +1,139 @@
+from abc import ABC, abstractmethod
 import tensorflow as tf
 import tensorflow.keras.backend as K
 import numpy as np
 from tensorflow.keras.models import Model
 from contextlib import suppress
-from tensorflow.keras.layers import Dense, Dropout, LayerNormalization, TimeDistributed, LSTM
+from tensorflow.keras import Input
+from tensorflow.keras.layers import Dense, Dropout, LayerNormalization, Embedding,\
+    TimeDistributed, LSTM, Reshape, Lambda
 from tensorflow.keras.losses import SparseCategoricalCrossentropy
 from . import MultiHeadAttention, PositionalEncoding, create_padding_mask, Sampling, tokenize_and_filter
-
-
-def encoder_layer(units, d_model, num_heads, dropout, name="encoder_layer"):
-    inputs = tf.keras.Input(shape=(None, d_model), name="inputs")
-    padding_mask = tf.keras.Input(shape=(1, 1, None), name="padding_mask")
-
-    attention = MultiHeadAttention(
-        d_model, num_heads, name="attention")({
-          'query': inputs,
-          'key': inputs,
-          'value': inputs,
-          'mask': padding_mask
-        })
-    attention = tf.keras.layers.Dropout(rate=dropout)(attention)
-    attention = tf.keras.layers.LayerNormalization(
-        epsilon=1e-6)(inputs + attention)
-
-    outputs = Dense(units=units, activation='relu')(attention)
-    outputs = Dense(units=d_model)(outputs)
-    outputs = Dropout(rate=dropout)(outputs)
-    outputs = LayerNormalization(epsilon=1e-6)(attention + outputs)
-
-    return Model(inputs=[inputs, padding_mask], outputs=outputs, name=name)
-
-
-def encoder(vocab_size, num_layers, units, d_model, num_heads,
-            dropout, latent_space, max_length, name="encoder"):
-  
-    inputs = tf.keras.Input(shape=(None,), name="inputs")
-    padding_mask = tf.keras.layers.Lambda(
-        create_padding_mask, output_shape=(1, 1, None),
-        name='enc_padding_mask')(inputs)
-
-    embeddings = tf.keras.layers.Embedding(vocab_size, d_model)(inputs)
-    embeddings *= tf.math.sqrt(tf.cast(d_model, tf.float32))
-    embeddings = PositionalEncoding(vocab_size, d_model)(embeddings)
-    outputs = tf.keras.layers.Dropout(rate=dropout)(embeddings)
-
-    for i in range(num_layers):
-        outputs = encoder_layer(
-                            units=units,
-                            d_model=d_model,
-                            num_heads=num_heads,
-                            dropout=dropout,
-                            name="encoder_layer_{}".format(i),
-                        )([outputs, padding_mask])
-
-    outputs = tf.keras.layers.Reshape([max_length * d_model])(outputs)
-    outputs = tf.keras.layers.Dense(max_length * 10)(outputs)
-    outputs = tf.keras.layers.Dense(latent_space)(outputs)
-
-    mu = Dense(latent_space, name='mu')(outputs) #TODO: revisar la dimensionalidad del espacio latente
-
-    logvar = Dense(latent_space, name='logvar')(outputs)
-    z = Sampling(name='encoder_output')([mu, logvar])
-
-    return Model(inputs=inputs, outputs=[mu, logvar, z], name=name)
-
-
-def decoder_layer(units, d_model, num_heads, dropout, name="decoder_layer"):
-    decoder_input = tf.keras.Input(shape=(None, d_model), name="decoder_input_layer")
-    attention1 = MultiHeadAttention(
-        d_model, num_heads, name="attention_1")(inputs={
-          'query': decoder_input,
-          'key': decoder_input,
-          'value': decoder_input,
-          'mask': None
-        })
-
-    attention1 = LayerNormalization(
-        epsilon=1e-6)(attention1 + decoder_input)
-
-    outputs = tf.keras.layers.Dense(units=units, activation='relu')(attention1)
-    outputs = tf.keras.layers.Dense(units=d_model)(outputs)
-    outputs = tf.keras.layers.Dropout(rate=dropout)(outputs)
-
-    outputs = tf.keras.layers.LayerNormalization(epsilon=1e-6)(outputs + attention1)
-
-    return tf.keras.Model(inputs=[decoder_input], outputs=outputs, name=name)
-
-
-def decoder(vocab_size, num_layers, units, d_model, num_heads, dropout, latent_space, max_length, name='decoder'):
-    decoder_input = tf.keras.Input(shape=(latent_space), name='decoder_input')
-    output = tf.keras.layers.Dense(max_length * 10)(decoder_input)
-    output = Dense(max_length * d_model, name='linear_proyection')(output)
-    output = tf.keras.layers.Reshape([max_length, d_model])(output)
-  
-    outputs = tf.keras.layers.Dropout(rate=dropout)(output)
-
-    for i in range(num_layers):
-        outputs = decoder_layer(
-            units=units,
-            d_model=d_model,
-            num_heads=num_heads,
-            dropout=dropout,
-            name='decoder_layer_{}'.format(i),
-        )(inputs=[outputs])
-
-    outputs = TimeDistributed(Dense(d_model))(outputs)
-    outputs = LSTM(units=d_model, return_sequences=True, name='LSTM')(outputs)
-    outputs = Dense(units=vocab_size, name="outputs")(outputs)
-
-    return Model(inputs=[decoder_input], outputs=outputs, name=name)
-
 
 beta = K.variable(value=0.0)
 beta._trainable = False
 
 
-class VAEModel(Model):
-    def __init__(self, encoder, decoder, a, b, vocab_size, num_layers, units, d_model, num_heads, dropout, latent_space,
+class VAEModel(Model, ABC):
+    def __init__(self, a, b, vocab_size, num_layers, units, d_model, num_heads, dropout, latent_space,
                  tokenizer, max_length=32, mask=None, function=None, **kwargs):
         super(VAEModel, self).__init__(**kwargs)
-        self.encoder = encoder(
-          vocab_size=vocab_size,
-          num_layers=num_layers,
-          units=units,
-          d_model=d_model,
-          num_heads=num_heads,
-          dropout=dropout,
-          latent_space=latent_space)
-        
-        self.decoder = decoder(
-          vocab_size=vocab_size,
-          num_layers=num_layers,
-          units=units,
-          d_model=d_model,
-          num_heads=num_heads,
-          dropout=dropout,
-          latent_space=latent_space)
-        
         self.a = a
         self.b = b
         self.function = function
         self.max_length = max_length
         self.tokenizer = tokenizer
+        self.num_layers = num_layers
+        self.units = units
+        self.d_model = d_model
+        self.num_heads = num_heads
+        self.dropout = dropout
+        self.latent_space = latent_space
+        self.vocab_size = vocab_size
+        self.mask = mask
 
+    @staticmethod
+    def encoder_layer(units, d_model, num_heads, dropout, name="encoder_layer"):
+        inputs = Input(shape=(None, d_model), name="inputs")
+        padding_mask = Input(shape=(1, 1, None), name="padding_mask")
 
+        attention = MultiHeadAttention(
+            d_model, num_heads, name="attention")({
+                'query': inputs,
+                'key': inputs,
+                'value': inputs,
+                'mask': padding_mask
+            })
+        attention = Dropout(rate=dropout)(attention)
+        attention = LayerNormalization(
+            epsilon=1e-6)(inputs + attention)
 
+        outputs = Dense(units=units, activation='relu')(attention)
+        outputs = Dense(units=d_model)(outputs)
+        outputs = Dropout(rate=dropout)(outputs)
+        outputs = LayerNormalization(epsilon=1e-6)(attention + outputs)
 
+        return Model(inputs=[inputs, padding_mask], outputs=outputs, name=name)
 
+    @abstractmethod
+    def encoder(self,  name="encoder"):
+        inputs = Input(shape=(None,), name="inputs")
+        padding_mask = Lambda(
+            create_padding_mask, output_shape=(1, 1, None),
+            name='enc_padding_mask')(inputs)
 
+        embeddings = Embedding(self.vocab_size, self.d_model)(inputs)
+        embeddings *= tf.math.sqrt(tf.cast(self.d_model, tf.float32))
+        embeddings = PositionalEncoding(self.vocab_size, self.d_model)(embeddings)
+        outputs = Dropout(rate=self.dropout)(embeddings)
+
+        for i in range(self.num_layers):
+            outputs = self.encoder_layer(
+                units=self.units,
+                d_model=self.d_model,
+                num_heads=self.num_heads,
+                dropout=self.dropout,
+                name="encoder_layer_{}".format(i),
+            )([outputs, padding_mask])
+
+        outputs = Reshape([self.max_length * self.d_model])(outputs)
+        outputs = Dense(self.max_length * 10)(outputs)
+        outputs = Dense(self.latent_space)(outputs)
+
+        mu = Dense(self.latent_space, name='mu')(outputs)  # TODO: revisar la dimensionalidad del espacio latente
+
+        logvar = Dense(self.latent_space, name='logvar')(outputs)
+        z = Sampling(name='encoder_output')([mu, logvar])
+
+        return Model(inputs=inputs, outputs=[mu, logvar, z], name=name)
+
+    @staticmethod
+    def decoder_layer(units, d_model, num_heads, dropout, name="decoder_layer"):
+        decoder_input = Input(shape=(None, d_model), name="decoder_input_layer")
+        attention1 = MultiHeadAttention(
+            d_model, num_heads, name="attention_1")(inputs={
+                'query': decoder_input,
+                'key': decoder_input,
+                'value': decoder_input,
+                'mask': None
+            })
+
+        attention1 = LayerNormalization(
+            epsilon=1e-6)(attention1 + decoder_input)
+
+        outputs = Dense(units=units, activation='relu')(attention1)
+        outputs = Dense(units=d_model)(outputs)
+        outputs = Dropout(rate=dropout)(outputs)
+
+        outputs = LayerNormalization(epsilon=1e-6)(outputs + attention1)
+
+        return Model(inputs=[decoder_input], outputs=outputs, name=name)
+
+    @abstractmethod
+    def decoder(self, name='decoder'):
+        decoder_input = Input(shape=self.latent_space, name='decoder_input')
+        output = Dense(self.max_length * 10)(decoder_input)
+        output = Dense(self.max_length * self.d_model, name='linear_proyection')(output)
+        output = Reshape([self.max_length, self.d_model])(output)
+
+        outputs = Dropout(rate=self.dropout)(output)
+
+        for i in range(self.num_layers):
+            outputs = self.decoder_layer(
+                units=self.units,
+                d_model=self.d_model,
+                num_heads=self.num_heads,
+                dropout=self.dropout,
+                name='decoder_layer_{}'.format(i),
+            )(inputs=[outputs])
+
+        outputs = TimeDistributed(Dense(self.d_model))(outputs)
+        outputs = LSTM(units=self.d_model, return_sequences=True, name='LSTM')(outputs)
+        outputs = Dense(units=self.vocab_size, name="outputs")(outputs)
+
+        return Model(inputs=[decoder_input], outputs=outputs, name=name)
+
+    @abstractmethod
     def loss_function(self, y_true, y_pred):
         print("ytrue:", y_true, "ypred:", y_pred)
         y_true = tf.reshape(y_true, shape=(-1, self.max_length))
@@ -157,6 +143,7 @@ class VAEModel(Model):
 
         return tf.reduce_mean(loss)
 
+    @abstractmethod
     def train_step(self, data):
         data = data[0]
         with tf.GradientTape() as tape:            
@@ -186,6 +173,7 @@ class VAEModel(Model):
             "kl_weight": factor,
         }
 
+    @abstractmethod
     def reconstruct(self, q_sample, silent_reconstruct=False, silent_orig=True):
         _, _, result = self.encoder(q_sample.reshape(1, self.max_length, 1))
         print('Reconstr: ', self.decode_sample(result, silent_reconstruct))
