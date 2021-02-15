@@ -1,8 +1,8 @@
 # Autoencoder Variacional Transformer-Based para Generación de frases
 
 ## Autores:
-### Adrián Di Paolo
-### Patricio Guinle
+#### Adrián Di Paolo
+#### Patricio Guinle
 
 ## Motivación y dataset
 
@@ -14,7 +14,7 @@
 <p align="center">
 
 </p>
-Nuestra motivación es crear un modelo de transferencia de estilo para texto, utilizando herramientas de NLP (transformers) y aprovechando la capacidad los Autoencoders Variacionales de generar un espacio contínuo. Para ello reprodujimos la arquitectura del paper https://ieeexplore.ieee.org/document/8852155 [[1]](#1) como punto de partida.
+Nuestra motivación es crear un modelo de transferencia de estilo para texto, utilizando herramientas de NLP (transformers) y aprovechando la capacidad los Autoencoders Variacionales de generar un espacio contínuo. Para ello reprodujimos la arquitectura del paper https://ieeexplore.ieee.org/document/8852155 [1] como punto de partida.
 
 <p align="center">
 
