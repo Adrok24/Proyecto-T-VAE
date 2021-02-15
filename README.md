@@ -49,21 +49,19 @@ Un análisis estadístico del dataset puede ser consultado en la siguiente noteb
 
 ## Modelos entrenados para la clasificación del dataset
 
- [presentación](https://github.com/Adrok24/classification-of-plant-diseases/blob/first_version/presentacion/Presentacion.pptx).
-
-
-### Modelos simple output
-* CNN Custom [Notebook]()
-
-
-
-* Otras pruebas pueden encontrarse en la [carpeta]() 
 
 
 
 ## Visualizaciones
 
+<p align="center">
+  <img src="https://github.com/Adrok24/Proyecto-T-VAE/blob/branch_3/images/latent_space_long.png?raw=true" alt="grafico_4" width="700" height="500"/>
+</p>
 
+
+
+
+ [presentación](https://github.com/Adrok24/classification-of-plant-diseases/blob/first_version/presentacion/Presentacion.pptx).
 
 
 <a id="1">[1]</a> A Transformer-Based Variational Autoencoder for Sentence Generation1 st Danyang Liu, 2 nd Gongshen Liu (2019)
