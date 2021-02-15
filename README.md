@@ -41,11 +41,12 @@ Sampleo del Dataset resultante:
 
 ## Modelo utilizado
 
+Una breve explicación del proceso de armado del modelo puede ser consultado en la siguiente [presentacion](https://github.com/Adrok24/Proyecto-T-VAE/blob/first_version/Presentacion.pptx). El siguiente es un equema del modelo final construído [1].
+
 <p align="center">
   <img src="https://github.com/Adrok24/Proyecto-T-VAE/blob/branch_3/images/model.png?raw=true" alt="grafico_3" width="500" height="400"/>
 </p>
 
-Una breve explicación del proceso de armado del modelo puede ser consultado en la siguiente [presentacion](https://github.com/Adrok24/Proyecto-T-VAE/blob/first_version/Presentacion.pptx).
 
 ## Funciones de Distribución
 
