@@ -11,9 +11,7 @@
 <p align="center">
 
 </p>
-
-El dataset provisto por PlantVillage consta de 54303 imágenes de hojas sanas y no saludables divididas en 38 categorías por especie y enfermedad. El artículo original puede encontrarse en https://arxiv.org/pdf/1511.08060.pdf, realizado por David. P. Hughes, Marcel Salathe [[1]](#1). 
-
+Nuestra motivación es crear un modelo de transferencia de estilo para texto, utilizando herramientas de NLP (transformers) y aprovechando la capacidad los Autoencoders Variacionales de generar un espacio contínuo. Para ello reprodujimos la arquitectura del paper https://ieeexplore.ieee.org/document/8852155 [[1]](#1) como punto de partida.
 
 <p align="center">
 
@@ -53,7 +51,8 @@ Un análisis estadístico del dataset puede ser consultado en la siguiente noteb
 
 
 
-<a id="1">[1]</a> An open access repository of images on plant health to enable the development of mobile disease diagnostics, David. P. Hughes and Marcel Salathe, 2016.
+<a id="1">[1]</a> A Transformer-Based Variational Autoencoder for Sentence Generation1 st Danyang Liu, 2 nd Gongshen Liu (2019)
+
 
 
 
