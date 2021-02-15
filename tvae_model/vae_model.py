@@ -28,8 +28,8 @@ class VAEModel(Model):
         self.latent_space = latent_space
         self.vocab_size = vocab_size
         self.mask = mask
-        self.encoder = self.encoder
-        self.decoder = self.decoder
+        self.encoder = encoder
+        self.decoder = decoder
 
     def loss_function(self, y_true, y_pred):
         print("ytrue:", y_true, "ypred:", y_pred)
