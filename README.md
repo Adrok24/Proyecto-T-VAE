@@ -50,17 +50,20 @@ Un análisis estadístico del dataset puede ser consultado en la siguiente noteb
 ## Funciones de Distribución
 
 <p align="center">
-  <img src="https://github.com/Adrok24/Proyecto-T-VAE/blob/branch_3/images/normal_distribution.jpg?raw=true" alt="grafico_5" width="30%"/>
-  <img src="https://github.com/Adrok24/Proyecto-T-VAE/blob/branch_3/images/von_mises_fisher.png?raw=true" alt="grafico_6" width="31%"/>
+  <img src="https://github.com/Adrok24/Proyecto-T-VAE/blob/branch_3/images/normal_distribution.jpg?raw=true" alt="grafico_4" width="30%"/>
+  <img src="https://github.com/Adrok24/Proyecto-T-VAE/blob/branch_3/images/von_mises_fisher.png?raw=true" alt="grafico_5" width="31%"/>
 </p>
 
 
 ## Visualizaciones
 
 <p align="center">
-  <img src="https://github.com/Adrok24/Proyecto-T-VAE/blob/branch_3/images/latent_space_long.png?raw=true" alt="grafico_4" width="700" height="500"/>
+  <img src="https://github.com/Adrok24/Proyecto-T-VAE/blob/branch_3/images/latent_space_long.png?raw=true" alt="grafico_6" width="700" height="500"/>
 </p>
 
+<p align="center">
+  <img src="https://github.com/Adrok24/Proyecto-T-VAE/blob/branch_3/images/latent_space_poetry.png?raw=true" alt="grafico_7" width="700" height="500"/>
+</p>
 
 
 
