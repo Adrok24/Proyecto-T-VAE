@@ -4,11 +4,11 @@
 #### Adrián Di Paolo
 #### Patricio Guinle
 
-## Motivación y dataset
+## Motivación 
 
 
 <p align="center">
-
+  <img src="https://github.com/Adrok24/Proyecto-T-VAE/blob/branch_3/images/transformer.jpg?raw=true" alt="grafico_1" width="400" height="200"/>
 </p>
 
 <p align="center">
@@ -16,18 +16,23 @@
 </p>
 Nuestra motivación es crear un modelo de transferencia de estilo para texto, utilizando herramientas de NLP (transformers) y aprovechando la capacidad los Autoencoders Variacionales de generar un espacio contínuo. Para ello reprodujimos la arquitectura del paper https://ieeexplore.ieee.org/document/8852155 [1] como punto de partida.
 
-<p align="center">
 
+## Dataset
+
+* Seleccionamos 120 libros de diferentes generos: técnicos, narrativos, y poéticos
+
+* Los separamos en líneas de entre 35 y 160 caracteres
+
+* Las filtramos y pre procesamos, definiendo algunas reglas con REGEX
+
+* Enmascaramos Nombres propios y números (@name @number)
+
+* Aplicamos un análisis de sentimiento Positivo, Neutral y Negativo a cada linea
+
+<p align="center">
+  <img src="https://github.com/Adrok24/Proyecto-T-VAE/blob/branch_3/images/dataset.png?raw=true" alt="grafico_2" width="800" height="200"/>
 </p>
 
-Distribución del dataset por clase,
-
-<p align="center">
-
-</p>
-
-
-Distribución del dataset por tipo de planta, 
 
 <p align="center">
 
