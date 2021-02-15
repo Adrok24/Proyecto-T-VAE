@@ -52,6 +52,8 @@ Una breve explicación del proceso de armado del modelo puede ser consultado en 
 
 ## Funciones de Distribución
 
+Utilizamos para el proceso de sampling dos tipos de distribución: Normal (izq.) y Von Mises-Fisher (der.) que se encuentra todavía en desarrollo. 
+
 <p align="center">
   <img src="https://github.com/Adrok24/Proyecto-T-VAE/blob/branch_3/images/normal_distribution.jpg?raw=true" alt="grafico_4" width="30%"/>
   <img src="https://github.com/Adrok24/Proyecto-T-VAE/blob/branch_3/images/von_mises_fisher.png?raw=true" alt="grafico_5" width="31%"/>
