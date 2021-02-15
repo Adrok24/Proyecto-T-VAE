@@ -45,7 +45,7 @@ Sampleo del Dataset resultante:
   <img src="https://github.com/Adrok24/Proyecto-T-VAE/blob/branch_3/images/model.png?raw=true" alt="grafico_3" width="500" height="400"/>
 </p>
 
-Un análisis estadístico del dataset puede ser consultado en la siguiente notebook: [Notebook](https://github.com/Adrok24/classification-of-plant-diseases/blob/first_version/Estadistica.ipynb)
+Una breve explicación del proceso de armado del modelo puede ser consultado en la siguiente [presentacion](https://github.com/Adrok24/Proyecto-T-VAE/blob/first_version/Presentacion.pptx).
 
 ## Funciones de Distribución
 
@@ -67,7 +67,7 @@ Un análisis estadístico del dataset puede ser consultado en la siguiente noteb
 
 
 
- [presentación](https://github.com/Adrok24/classification-of-plant-diseases/blob/first_version/presentacion/Presentacion.pptx).
+ [presentación](https://github.com/Adrok24/Proyecto-T-VAE/blob/first_version/Presentacion.pptx).
 
 
 <a id="1">[1]</a> A Transformer-Based Variational Autoencoder for Sentence Generation1 st Danyang Liu, 2 nd Gongshen Liu (2019)
