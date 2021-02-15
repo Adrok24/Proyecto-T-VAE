@@ -18,17 +18,14 @@ def create_look_ahead_mask(x):
 def tokenize_and_filter_df(inputs, tokenizer, max_length):
     tokenized_inputs = {}
     count_dict = 0
-    sentence = None
-    line = None
     for index, line in inputs.iterrows():
         sentence = line['line']
         sentence = tokenizer.encode(sentence)
-    # filtramos
-    if len(sentence) <= max_length:
-        tokenized_inputs[count_dict] = {"line": sentence, "len": len(sentence), "genre": line['genre']}
-        count_dict += 1
+        if len(sentence) <= max_length:
+            tokenized_inputs[count_dict] = {"line": sentence, "len": len(sentence), "genre": line['genre']}
+            count_dict += 1
     data_filtered = pd.DataFrame.from_dict(tokenized_inputs, "index")
-  
+
     return data_filtered
 
 
