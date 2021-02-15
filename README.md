@@ -39,6 +39,8 @@ Sampleo del Dataset resultante:
   <img src="https://github.com/Adrok24/Proyecto-T-VAE/blob/branch_3/images/dataset.png?raw=true" alt="grafico_2" width="800" height="200"/>
 </p>
 
+El tokenizador se puede encontrar en el siguiente archivo pkl: [tokenizer.pkl](https://github.com/Adrok24/Proyecto-T-VAE/blob/first_version/tokenizer.pkl).
+
 ## Modelo utilizado
 
 Una breve explicación del proceso de armado del modelo puede ser consultado en la siguiente [presentacion](https://github.com/Adrok24/Proyecto-T-VAE/blob/first_version/Presentacion.pptx). El siguiente es un equema del modelo final construído [1].
