@@ -4,7 +4,7 @@ import numpy as np
 from tensorflow.keras.models import Model
 from contextlib import suppress
 from tensorflow.keras.losses import SparseCategoricalCrossentropy
-from .utils import create_padding_mask, tokenize_and_filter
+from .utils import tokenize_and_filter
 
 
 beta = K.variable(value=0.0)
