@@ -32,30 +32,33 @@ class VAEModel(Model):
         self.latent_space = latent_space
         self.vocab_size = vocab_size
         self.mask = mask
+        self.vae_encoder = self.encoder()
+        self.vae_decoder = self.encoder()
 
-    def encoder_layer(self, name="encoder_layer"):
-        inputs = Input(shape=(None, self.d_model), name="inputs")
+    @staticmethod
+    def encoder_layer(units, d_model, num_heads, dropout, name="encoder_layer"):
+        inputs = Input(shape=(None, d_model), name="inputs")
         padding_mask = Input(shape=(1, 1, None), name="padding_mask")
 
         attention = MultiHeadAttention(
-            self.d_model, self.num_heads, name="attention")({
+            d_model, num_heads, name="attention")({
                 'query': inputs,
                 'key': inputs,
                 'value': inputs,
                 'mask': padding_mask
             })
-        attention = Dropout(rate=self.dropout)(attention)
+        attention = Dropout(rate=dropout)(attention)
         attention = LayerNormalization(
             epsilon=1e-6)(inputs + attention)
 
-        outputs = Dense(units=self.units, activation='relu')(attention)
-        outputs = Dense(units=self.d_model)(outputs)
-        outputs = Dropout(rate=self.dropout)(outputs)
+        outputs = Dense(units=units, activation='relu')(attention)
+        outputs = Dense(units=d_model)(outputs)
+        outputs = Dropout(rate=dropout)(outputs)
         outputs = LayerNormalization(epsilon=1e-6)(attention + outputs)
 
         return Model(inputs=[inputs, padding_mask], outputs=outputs, name=name)
 
-    def encoder(self, name="encoder"):
+    def encoder(self,  name="encoder"):
         inputs = Input(shape=(None,), name="inputs")
         padding_mask = Lambda(
             create_padding_mask, output_shape=(1, 1, None),
@@ -68,6 +71,10 @@ class VAEModel(Model):
 
         for i in range(self.num_layers):
             outputs = self.encoder_layer(
+                units=self.units,
+                d_model=self.d_model,
+                num_heads=self.num_heads,
+                dropout=self.dropout,
                 name="encoder_layer_{}".format(i),
             )([outputs, padding_mask])
 
@@ -82,10 +89,11 @@ class VAEModel(Model):
 
         return Model(inputs=inputs, outputs=[mu, logvar, z], name=name)
 
-    def decoder_layer(self, name="decoder_layer"):
-        decoder_input = Input(shape=(None, self.d_model), name="decoder_input_layer")
+    @staticmethod
+    def decoder_layer(units, d_model, num_heads, dropout, name="decoder_layer"):
+        decoder_input = Input(shape=(None, d_model), name="decoder_input_layer")
         attention1 = MultiHeadAttention(
-            self.d_model, self.num_heads, name="attention_1")(inputs={
+            d_model, num_heads, name="attention_1")(inputs={
                 'query': decoder_input,
                 'key': decoder_input,
                 'value': decoder_input,
@@ -95,9 +103,9 @@ class VAEModel(Model):
         attention1 = LayerNormalization(
             epsilon=1e-6)(attention1 + decoder_input)
 
-        outputs = Dense(units=self.units, activation='relu')(attention1)
-        outputs = Dense(units=self.d_model)(outputs)
-        outputs = Dropout(rate=self.dropout)(outputs)
+        outputs = Dense(units=units, activation='relu')(attention1)
+        outputs = Dense(units=d_model)(outputs)
+        outputs = Dropout(rate=dropout)(outputs)
 
         outputs = LayerNormalization(epsilon=1e-6)(outputs + attention1)
 
@@ -113,6 +121,10 @@ class VAEModel(Model):
 
         for i in range(self.num_layers):
             outputs = self.decoder_layer(
+                units=self.units,
+                d_model=self.d_model,
+                num_heads=self.num_heads,
+                dropout=self.dropout,
                 name='decoder_layer_{}'.format(i),
             )(inputs=[outputs])
 
@@ -134,9 +146,9 @@ class VAEModel(Model):
     def train_step(self, data):
         data = data[0]
         with tf.GradientTape() as tape:            
-            
-            z_mean, z_log_var, z = self.encoder(data)
-            reconstruction = self.decoder(z)
+
+            z_mean, z_log_var, z = self.vae_encoder(data)
+            reconstruction = self.vae_decoder(z)
 
             reconstruction_loss = self.loss_function(data, reconstruction)
 
@@ -161,15 +173,14 @@ class VAEModel(Model):
         }
 
     def reconstruct(self, q_sample, silent_reconstruct=False, silent_orig=True):
-        _, _, result = self.encoder(q_sample.reshape(1, self.max_length, 1))
+        _, _, result = self.vae_encoder(q_sample.reshape(1, self.max_length, 1))
         print('Reconstr: ', self.decode_sample(result, silent_reconstruct))
         print('Original: ', self.tokenizer.decode([i for i in q_sample if i < self.tokenizer.vocab_size]))
         if not silent_orig:
             print(q_sample)
 
     def decode_sample(self, z_sampled, silent_reconstruct=False):
-        vmodel_decoder = self.decoder()
-        result = vmodel_decoder(z_sampled)
+        result = self.vae_decoder(z_sampled)
         with suppress(Exception):
             prediction = np.argmax(result, axis=2)
 
@@ -186,8 +197,6 @@ class VAEModel(Model):
         return self.reconstruct(sentence, silent_reconstruct, silent_orig)
 
     def call(self, inputs):
-        vmodel_encoder = self.encoder()
-        vmodel_decoder = self.decoder()
-        mu, logvar, z = vmodel_encoder(inputs)
+        mu, logvar, z = self.vae_encoder(inputs)
         print("checkpoint_call")
-        return vmodel_decoder(z)
+        return self.vae_decoder(z)
