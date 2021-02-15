@@ -1,5 +1,8 @@
-# Proyecto T-VAE
+# Autoencoder Variacional Transformer-Based para Generación de frases
 
+Autores:
+Adrián Di Paolo
+Patricio Guinle
 
 ## Motivación y dataset
 
