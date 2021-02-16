@@ -22,7 +22,7 @@ def tokenize_and_filter_df(inputs, tokenizer, max_length):
         sentence = line['line']
         sentence = tokenizer.encode(sentence)
         if len(sentence) <= max_length:
-            tokenized_inputs[count_dict] = {"line": sentence, "len": len(sentence), "genre": line['genre']}
+            tokenized_inputs[count_dict] = {"line": line['line'], 'secuence': sentence, "len": len(sentence), "genre": line['genre'], "sent": line['Sentimiento']}
             count_dict += 1
     data_filtered = pd.DataFrame.from_dict(tokenized_inputs, "index")
 
