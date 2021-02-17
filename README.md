@@ -10,11 +10,12 @@
 
 ## Motivación 
 
-
 Nuestra motivación es crear un modelo de transferencia de estilo para texto, utilizando herramientas de NLP (transformers) y aprovechando la capacidad los Autoencoders Variacionales de generar un espacio contínuo. Para ello reprodujimos la arquitectura del paper https://ieeexplore.ieee.org/document/8852155 [1] como punto de partida.
 
 
-## Dataset
+## Dataset  
+
+[(Notebook)](https://github.com/Adrok24/Proyecto-T-VAE/blob/branch_3/Preprocessing_corpus.ipynb)
 
 * Seleccionamos 120 libros de diferentes generos: técnicos, narrativos, y poéticos
 
@@ -39,26 +40,29 @@ Sampleo del Dataset resultante:
   <img src="https://github.com/Adrok24/Proyecto-T-VAE/blob/branch_3/images/dataset.png?raw=true" alt="grafico_2" width="800" height="200"/>
 </p>
 
-El tokenizador se puede encontrar en el siguiente archivo pkl: [tokenizer.pkl](https://github.com/Adrok24/Proyecto-T-VAE/blob/first_version/tokenizer.pkl).
+El tokenizador se puede encontrar en el siguiente archivo pkl: [tokenizer.pkl](https://github.com/Adrok24/Proyecto-T-VAE/blob/branch_3/tokenizer.pkl).
+
+## Notebooks Principales
+
+* Entrenamiento: [(Notebook)](https://github.com/Adrok24/Proyecto-T-VAE/blob/branch_3/T_VAE_Train.ipynb)
+* Test y visualizaciones: [(Notebook)](https://github.com/Adrok24/Proyecto-T-VAE/blob/branch_3/TVAE_Test.ipynb)
 
 ## Modelo utilizado
 
-Una breve explicación del proceso de armado del modelo puede ser consultado en la siguiente [presentacion](https://github.com/Adrok24/Proyecto-T-VAE/blob/first_version/Presentacion.pptx). El siguiente es un equema del modelo final construído [1].
+Una breve explicación del proceso de armado del modelo puede ser consultado en la siguiente [presentacion](https://github.com/Adrok24/Proyecto-T-VAE/blob/branch_3/Presentacion.pptx). El siguiente es un equema del modelo final construído [1].
 
 <p align="center">
   <img src="https://github.com/Adrok24/Proyecto-T-VAE/blob/branch_3/images/model.png?raw=true" alt="grafico_3" width="500" height="400"/>
 </p>
 
-
 ## Funciones de Distribución
 
-Utilizamos para el proceso de sampling dos tipos de distribución: Normal (izq.) y Von Mises-Fisher (der.) que se encuentra todavía en entrenamiento y desarrollo [(notebook)](https://github.com/Adrok24/Proyecto-T-VAE/blob/first_version/TVAE_von_mises_fisher.ipynb). 
+Utilizamos para el proceso de sampling dos tipos de distribución: Normal (izq.) y Von Mises-Fisher (der.) que se encuentra todavía en entrenamiento y desarrollo [(notebook)](https://github.com/Adrok24/Proyecto-T-VAE/blob/branch_3/von_misses_fisher/TVAE_von_mises_fisher.ipynb). 
 
 <p align="center">
   <img src="https://github.com/Adrok24/Proyecto-T-VAE/blob/branch_3/images/normal_distribution.jpg?raw=true" alt="grafico_4" width="30%"/>
   <img src="https://github.com/Adrok24/Proyecto-T-VAE/blob/branch_3/images/von_mises_fisher.png?raw=true" alt="grafico_5" width="31%"/>
 </p>
-
 
 ## Visualizaciones
 
@@ -71,12 +75,7 @@ Utilizamos para el proceso de sampling dos tipos de distribución: Normal (izq.)
 </p>
 
 
-
- [presentación](https://github.com/Adrok24/Proyecto-T-VAE/blob/first_version/Presentacion.pptx).
+ [presentación](https://github.com/Adrok24/Proyecto-T-VAE/blob/branch_3/Presentacion.pptx).
 
 
 <a id="1">[1]</a> A Transformer-Based Variational Autoencoder for Sentence Generation1 st Danyang Liu, 2 nd Gongshen Liu (2019)
-
-
-
-
