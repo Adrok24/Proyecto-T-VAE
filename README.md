@@ -8,14 +8,20 @@
 ##### Adrián Di Paolo
 ##### Patricio Guinle
 
+
+## Notebooks Principales
+
+* Entrenamiento: [(Notebook)](https://github.com/Adrok24/Proyecto-T-VAE/blob/branch_3/T_VAE_Train.ipynb)
+* Test y visualizaciones: [(Notebook)](https://github.com/Adrok24/Proyecto-T-VAE/blob/branch_3/TVAE_Test.ipynb)
+
+
 ## Motivación 
 
 Nuestra motivación es crear un modelo de transferencia de estilo para texto, utilizando herramientas de NLP (transformers) y aprovechando la capacidad los Autoencoders Variacionales de generar un espacio contínuo. Para ello reprodujimos la arquitectura del paper https://ieeexplore.ieee.org/document/8852155 [1] como punto de partida.
 
 
-## Dataset  
+## Dataset  [(Notebook)](https://github.com/Adrok24/Proyecto-T-VAE/blob/branch_3/Preprocessing_corpus.ipynb)
 
-[(Notebook)](https://github.com/Adrok24/Proyecto-T-VAE/blob/branch_3/Preprocessing_corpus.ipynb)
 
 * Seleccionamos 120 libros de diferentes generos: técnicos, narrativos, y poéticos
 
@@ -42,10 +48,6 @@ Sampleo del Dataset resultante:
 
 El tokenizador se puede encontrar en el siguiente archivo pkl: [tokenizer.pkl](https://github.com/Adrok24/Proyecto-T-VAE/blob/branch_3/tokenizer.pkl).
 
-## Notebooks Principales
-
-* Entrenamiento: [(Notebook)](https://github.com/Adrok24/Proyecto-T-VAE/blob/branch_3/T_VAE_Train.ipynb)
-* Test y visualizaciones: [(Notebook)](https://github.com/Adrok24/Proyecto-T-VAE/blob/branch_3/TVAE_Test.ipynb)
 
 ## Modelo utilizado
 
@@ -54,6 +56,7 @@ Una breve explicación del proceso de armado del modelo puede ser consultado en 
 <p align="center">
   <img src="https://github.com/Adrok24/Proyecto-T-VAE/blob/branch_3/images/model.png?raw=true" alt="grafico_3" width="500" height="400"/>
 </p>
+
 
 ## Funciones de Distribución
 
@@ -64,15 +67,25 @@ Utilizamos para el proceso de sampling dos tipos de distribución: Normal (izq.)
   <img src="https://github.com/Adrok24/Proyecto-T-VAE/blob/branch_3/images/von_mises_fisher.png?raw=true" alt="grafico_5" width="31%"/>
 </p>
 
+
 ## Visualizaciones
 
+
+* Distribucion de la longitud (Tokens)
 <p align="center">
   <img src="https://github.com/Adrok24/Proyecto-T-VAE/blob/branch_3/images/latent_space_long.png?raw=true" alt="grafico_6" width="700" height="500"/>
 </p>
 
+* Distribucion de lineas con atributo 'Poesía'
 <p align="center">
   <img src="https://github.com/Adrok24/Proyecto-T-VAE/blob/branch_3/images/latent_space_poetry.png?raw=true" alt="grafico_7" width="700" height="500"/>
 </p>
+
+* Distribucion de lineas con signos [!, ¡, ¿, ?]
+<p align="center">
+  <img src="https://github.com/Adrok24/Proyecto-T-VAE/blob/branch_3/images/latent_space_signs.png?raw=true" alt="grafico_7" width="700" height="500"/>
+</p>
+
 
 
  [presentación](https://github.com/Adrok24/Proyecto-T-VAE/blob/branch_3/Presentacion.pptx).
