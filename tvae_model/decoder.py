@@ -46,6 +46,7 @@ def decoder(vocab_size, num_layers, units, d_model, num_heads,
 
     outputs = TimeDistributed(Dense(d_model))(outputs)
     outputs = LSTM(units=d_model, return_sequences=True, name='LSTM')(outputs)
+    outputs = TimeDistributed(Dense(d_model))(outputs)
     outputs = Dense(units=vocab_size, name="outputs")(outputs)
 
     return Model(inputs=[decoder_input], outputs=outputs, name=name)
