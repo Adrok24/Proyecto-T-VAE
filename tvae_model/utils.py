@@ -39,12 +39,17 @@ def tokenize_and_filter(inputs, tokenizer, max_length):
     tokenized_inputs = tf.keras.preprocessing.sequence.pad_sequences(
         tokenized_inputs, maxlen=max_length, padding='post')
 
+    return tokenized_inputs
+
 
 def generate_from_normal(model, n_sentences=3, latent_space=32):
-  errores = 0
-  for i in range(n_sentences):
-    z_sampled = tf.random.normal(shape=(1,latent_space))
-    prediction = model.decode_sample(z_sampled,silent_reconstruct=True)
-    print(i, ' gen_norm:', prediction)
+    errores = 0
+    predictions = []
+    for i in range(n_sentences):
+        z_sampled = tf.random.normal(shape=(1,latent_space))
+        prediction = model.decode_sample(z_sampled,silent_reconstruct=True)
+        predictions.append(prediction)
+
+    return predictions
   
-    return tokenized_inputs
+
