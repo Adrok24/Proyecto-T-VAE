@@ -32,7 +32,6 @@ class VAEModel(Model):
         self.decoder = decoder
 
     def loss_function(self, y_true, y_pred):
-        print("ytrue:", y_true, "ypred:", y_pred)
         y_true = tf.reshape(y_true, shape=(-1, self.max_length))
       
         loss = SparseCategoricalCrossentropy(
@@ -70,11 +69,12 @@ class VAEModel(Model):
         }
 
     def reconstruct(self, q_sample, silent_reconstruct=False, silent_orig=True):
-        _, _, result = self.encoder(q_sample.reshape(1, self.max_length, 1))
-        print('Reconstr: ', self.decode_sample(result, silent_reconstruct))
-        print('Original: ', self.tokenizer.decode([i for i in q_sample if i < self.tokenizer.vocab_size]))
-        if not silent_orig:
-            print(q_sample)
+        with suppress(Exception):
+            _, _, result = self.encoder(q_sample.reshape(1, self.max_length, 1))
+            print('Reconstr: ', self.decode_sample(result, silent_reconstruct))
+            print('Original: ', self.tokenizer.decode([i for i in q_sample if i < self.tokenizer.vocab_size]))
+            if not silent_orig:
+                print(q_sample)
 
     def decode_sample(self, z_sampled, silent_reconstruct=False):
         result = self.decoder(z_sampled)
